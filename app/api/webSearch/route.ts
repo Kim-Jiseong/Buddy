@@ -4,7 +4,7 @@ import { streamText } from "ai";
 import { z } from "zod";
 import { tools } from "./tools";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 export async function POST(req: Request) {
   const url = new URL(req.url);
