@@ -8,7 +8,8 @@ export const maxDuration = 300;
 
 export async function POST(req: Request) {
   const url = new URL(req.url);
-  const query = url.searchParams.get("query") || "";
+  const encodedQuery = url.searchParams.get("query") || "";
+  const query = atob(encodedQuery);
   const { messages } = await req.json();
   const result = streamText({
     model: anthropic("claude-3-5-sonnet-latest"),
