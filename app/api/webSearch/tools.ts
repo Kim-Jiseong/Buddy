@@ -1,4 +1,5 @@
 import { z } from "zod";
+import puppeteer from "puppeteer";
 
 export const tools = {
   searchWeb: {
@@ -6,13 +7,24 @@ export const tools = {
     parameters: z.object({
       query: z.string().describe("검색어를 여기에 입력"),
     }),
-    execute: async ({ query }: { query: number }) => {
-      return {
-        success: true,
-        content: query,
-      };
+    execute: async ({ query }: { query: string }) => {
+      const puppeteer = require("puppeteer");
+
+      try {
+        const results = await fetchTopResultsContent(query);
+        return {
+          success: true,
+          content: results,
+        };
+      } catch (error) {
+        return {
+          success: false,
+          content: `검색 중 오류가 발생했습니다`,
+        };
+      }
     },
   },
+
   //   getSeatsOfSpecificLibraries: {
   //     description:
   //       "고려대학교의 특정 열람실의 사용 가능한 좌석 정보를 가져옵니다.",
@@ -33,3 +45,16 @@ export const tools = {
   //     parameters: z.object({}),
   //   },
 };
+
+async function fetchTopResultsContent(query: string) {
+  const googleSearchURL = `https://www.google.com/search?q=${encodeURIComponent(
+    query
+  )}`;
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+  try {
+    // ... fetchTopResultsContent 함수의 나머지 내용 ...
+  } finally {
+    await browser.close();
+  }
+}
