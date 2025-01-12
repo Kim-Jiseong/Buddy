@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       text: formData.get("text") as string,
       channel: formData.get("channel_id") as string,
     });
-    return { message: "잠깐 기다려주세요." };
+    return new Response("잠시만 기다려주세요");
   } else {
     const body = await req.json();
     messages = body.messages;
