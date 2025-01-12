@@ -110,7 +110,7 @@ export async function POST(req: Request) {
   } else {
     const body = await req.json();
     messages = body.messages;
-    return new Response(JSON.stringify("ok"));
+    return new Response("잠시만 기다려주세요");
   }
 
   //   console.log("Request content-type:", contentType);
