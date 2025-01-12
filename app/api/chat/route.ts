@@ -16,10 +16,10 @@ export async function POST(req: Request) {
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
 
-    // await web.chat.postMessage({
-    //   text: formData.get("messages") as string,
-    //   channel: formData.get("channel_id") as string,
-    // });
+    await web.chat.postMessage({
+      text: formData.get("text") as string,
+      channel: formData.get("channel_id") as string,
+    });
 
     // await web.chat.postMessage({
     //   text: "잠시만 기다려주세요...",
