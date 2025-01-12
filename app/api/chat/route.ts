@@ -66,25 +66,19 @@ export async function POST(req: Request) {
         process.stdout.write(textPart);
         fullText += textPart;
       }
-
-      if (fullText && fullText.trim()) {
-        web.chat
-          .postMessage({
-            text: fullText,
-            channel: formData.get("channel_id") as string,
-          })
-          .catch((error) => {
-            console.error("메시지 전송 실패:", error);
-          });
-      }
+      console.log(fullText);
+      web.chat.postMessage({
+        text: fullText,
+        channel: formData.get("channel_id") as string,
+      });
     })();
 
     // 즉시 응답 반환
-    return new Response("/reserve" + userText);
+    return new Response("/reserve " + userText);
   } else {
     const body = await req.json();
     messages = body.messages;
-    return new Response("잠시만 기다려주세요");
+    return new Response("잠시만 기다려주세요...");
   }
 
   //   console.log("Request content-type:", contentType);
