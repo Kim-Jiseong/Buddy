@@ -44,13 +44,23 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
       {
         "name": "2층 제1열람실",
         "nameEng": "2F Reading Room 1",
-        "availableSeats": 100,
+        "availableSeats": 100(available - inUse),
         "noteBookYN": "Y",
+        "startTm": "0600",
+        "endTm": "2300"
+      },
+      {
+        "name": "3층 제2열람실",
+        "nameEng": "3F Reading Room 2",
+        "availableSeats": 100(available - inUse),
+        "noteBookYN": "N",
         "startTm": "0600",
         "endTm": "2300"
       }
     ],
-    "totalAvailableSeats": 100
+    "totalAvailableSeats": 100(다 더한 값)
+  },{
+    ...도서관 별로 계속 진행
   }
 ]
 ```
