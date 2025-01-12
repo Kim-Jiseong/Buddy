@@ -33,6 +33,8 @@ export async function POST(req: Request) {
       channel: formData.get("channel_id") as string,
     });
 
+    console.log("Stream 시작:", userText); // 스트림 시작 로그
+
     const { textStream } = streamText({
       model: anthropic("claude-3-5-sonnet-latest"),
       messages: [
@@ -60,25 +62,37 @@ export async function POST(req: Request) {
 
     // 텍스트 수집과 메시지 전송을 비동기로 처리
     (async () => {
-      let fullText = "";
+      try {
+        console.log("비동기 처리 시작"); // 비동기 함수 시작 로그
+        let fullText = "";
 
-      for await (const textPart of textStream) {
-        process.stdout.write(textPart);
-        fullText += textPart;
+        for await (const textPart of textStream) {
+          console.log("텍스트 파트:", textPart); // 각 텍스트 파트 로그
+          process.stdout.write(textPart);
+          fullText += textPart;
+        }
+
+        console.log("전체 텍스트 수집 완료:", fullText); // 전체 텍스트 로그
+
+        if (fullText && fullText.trim()) {
+          console.log("슬랙 메시지 전송 시도"); // 슬랙 전송 시도 로그
+          await web.chat.postMessage({
+            text: fullText,
+            channel: formData.get("channel_id") as string,
+          });
+          console.log("슬랙 메시지 전송 완료"); // 슬랙 전송 완료 로그
+        }
+      } catch (error) {
+        console.error("에러 발생:", error); // 에러 로그
       }
-      console.log(fullText);
-      web.chat.postMessage({
-        text: fullText,
-        channel: formData.get("channel_id") as string,
-      });
     })();
 
     // 즉시 응답 반환
-    return new Response("/reserve " + userText);
+    return new Response("ok");
   } else {
     const body = await req.json();
     messages = body.messages;
-    return new Response("잠시만 기다려주세요...");
+    return new Response(".");
   }
 
   //   console.log("Request content-type:", contentType);
