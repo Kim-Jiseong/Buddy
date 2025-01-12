@@ -1,7 +1,7 @@
 // utils/slack.js
 import axios from "axios";
 
-const SLACK_API_TOKEN = process.env.SLACK_API_TOKEN;
+const SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN;
 
 // Fetch conversations history
 export const fetchConversationHistory = async (channelId: string) => {
@@ -10,7 +10,7 @@ export const fetchConversationHistory = async (channelId: string) => {
       "https://slack.com/api/conversations.history",
       {
         headers: {
-          Authorization: `Bearer ${SLACK_API_TOKEN}`,
+          Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
         },
         params: {
           channel: channelId,
@@ -34,7 +34,7 @@ export const fetchUserInfo = async (userId: string) => {
   try {
     const response = await axios.get("https://slack.com/api/users.info", {
       headers: {
-        Authorization: `Bearer ${SLACK_API_TOKEN}`,
+        Authorization: `Bearer ${SLACK_BOT_TOKEN}`,
       },
       params: {
         user: userId,

@@ -13,13 +13,30 @@ export async function POST(req: Request) {
   try {
     const web = new WebClient(process.env.SLACK_BOT_TOKEN);
     const { text, channel_id } = await req.json();
-    console.log(channel_id, text);
+
+    // text가 비어있는 경우 처리
+    const userInput = text?.trim();
+    const decodedInput = userInput
+      ? decodeURIComponent(userInput.replace(/\+/g, " "))
+      : "";
+
+    console.log(channel_id, decodedInput);
     const messages = await fetchConversationHistory(channel_id);
     const updatedMessages = await replaceUserIdsWithInfo(messages);
-    console.log(updatedMessages);
-
+    const processedMessages = updatedMessages
+      .filter((message) => message.text)
+      .map((message) => ({
+        role:
+          message.user && message.user.name === "buddy"
+            ? ("assistant" as const)
+            : ("user" as const),
+        content: message.text || "",
+      }))
+      .reverse()
+      .slice(0, 10);
+    // console.log(processedMessages);
     await web.chat.postMessage({
-      text: "잠시만 기다려주세요...",
+      text: "/reserve " + decodedInput,
       channel: channel_id,
     });
 
@@ -33,7 +50,7 @@ export async function POST(req: Request) {
             {
               role: "system",
               content: `
-                    너는 대단히 중요한 클라이언트인 고려대학교 학생들의 학습을 돕는 어시스턴트 "호랭이"야.
+                    너는 대단히 중요한 클라이언트인 고려대학교 학생들의 학습을 돕는 어시스턴트 "Buddy"야.
                     너는 유저의 요청에 따라 장소, 시설 등 여러 자원들을 예약하는 작업을 수행하여 유저의 학습에 문제가 없도록 지원해야해.
                     단계별로 유저의 요청을 구체화하고 도구들을 적극적으로 활용해.
                     유저의 요청이 명확하지 않다면 유저에게 명확하게 요청을 구체화하도록 요청해.
@@ -44,8 +61,10 @@ export async function POST(req: Request) {
                     작업을 위해 충분한 정보를 얻지 못했을 경우 유저에게 물어봐.
                     `,
             },
-            { role: "user", content: text },
+            ...processedMessages,
+            { role: "user", content: decodedInput || "입력값 없음" },
           ],
+          tools,
         });
 
         let fullText = "";
