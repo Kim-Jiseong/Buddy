@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
-    const generatedText = await streamText({
+    const generatedText = streamText({
       model: anthropic("claude-3-5-sonnet-latest"),
       messages: [
         {
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       async onFinish(response) {
         console.log(response);
         const result = await web.chat.postMessage({
-          text: "완료됨",
+          text: "완료됨" + response.text,
           channel: formData.get("channel_id") as string,
         });
       },
