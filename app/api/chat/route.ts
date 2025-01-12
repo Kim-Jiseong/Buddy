@@ -13,11 +13,11 @@ export async function POST(req: Request) {
   try {
     const web = new WebClient(process.env.SLACK_BOT_TOKEN);
     const { text, channel_id } = await req.json();
+    console.log(channel_id, text);
     const messages = await fetchConversationHistory(channel_id);
     const updatedMessages = await replaceUserIdsWithInfo(messages);
     console.log(updatedMessages);
-    // 1) '잠시만 기다려주세요...' 안내 메시지를 바로 보냄
-    //    - 본문 Slash Command 응답이 늦어지면 에러가 뜨므로, 가능한 한 빨리 전송 후 곧바로 200 응답
+
     await web.chat.postMessage({
       text: "잠시만 기다려주세요...",
       channel: channel_id,
