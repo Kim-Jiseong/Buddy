@@ -71,18 +71,17 @@ export async function POST(req: Request) {
       return new Response("Error: No response generated", { status: 500 });
     }
 
-    // 수집된 전체 텍스트를 한 번에 전송
-    try {
-      await web.chat.postMessage({
+    // 메시지 전송을 비동기로 실행하고 즉시 응답
+    web.chat
+      .postMessage({
         text: fullText,
         channel: formData.get("channel_id") as string,
+      })
+      .catch((error) => {
+        console.error("메시지 전송 실패:", error);
       });
 
-      return new Response("ok");
-    } catch (error) {
-      console.error("메시지 전송 실패:", error);
-      return new Response("Error sending message", { status: 500 });
-    }
+    return new Response("ok");
   } else {
     const body = await req.json();
     messages = body.messages;
