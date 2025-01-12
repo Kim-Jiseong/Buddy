@@ -12,15 +12,30 @@ export const maxDuration = 60;
 export async function POST(req: Request) {
   try {
     const web = new WebClient(process.env.SLACK_BOT_TOKEN);
-    const { text, channel_id } = await req.json();
-    const messages = await fetchConversationHistory(channel_id);
+    const formData = await req.formData();
+    const userText = (formData.get("text") as string) ?? "";
+    const channelId = (formData.get("channel_id") as string) ?? "";
+    const messages = await fetchConversationHistory(channelId);
     const updatedMessages = await replaceUserIdsWithInfo(messages);
     console.log(updatedMessages);
     // 1) '잠시만 기다려주세요...' 안내 메시지를 바로 보냄
     //    - 본문 Slash Command 응답이 늦어지면 에러가 뜨므로, 가능한 한 빨리 전송 후 곧바로 200 응답
     await web.chat.postMessage({
       text: "잠시만 기다려주세요...",
-      channel: channel_id,
+      channel: channelId,
+    });
+
+    // 2) 3초 내 응답을 위해 곧바로 HTTP Response(200)를 반환 (Slack에서는 이미 "성공"으로 간주)
+    //    이 시점에 Slash Command 요청/응답은 완료되므로, Slack이 타임아웃을 일으키지 않음.
+    const quickResponse = {
+      response_type: "ephemeral", // 혹은 "in_channel" 로 바꿀 수 있음
+      text: "/reserve " + userText,
+    };
+    // 여기서 200 OK를 즉시 return 해 줍니다.
+    // (이후 로직은 백그라운드에서 수행)
+    const immediateResponse = new Response(JSON.stringify(quickResponse), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
     });
 
     // 3) 백그라운드에서 AI 응답 받기 (비동기로 실행)
@@ -44,7 +59,7 @@ export async function POST(req: Request) {
                     작업을 위해 충분한 정보를 얻지 못했을 경우 유저에게 물어봐.
                     `,
             },
-            { role: "user", content: text },
+            { role: "user", content: userText },
           ],
         });
 
@@ -56,17 +71,19 @@ export async function POST(req: Request) {
         // 스트리밍 결과가 나오면 최종 메시지 전송
         await web.chat.postMessage({
           text: fullText.trim() || "내용이 없습니다.",
-          channel: channel_id,
+          channel: channelId,
         });
       } catch (error) {
         console.error("비동기 AI 처리 중 에러:", error);
         await web.chat.postMessage({
           text: "에러가 발생했어요.",
-          channel: channel_id,
+          channel: channelId,
         });
       }
     })();
-    return new Response("OK", { status: 200 });
+
+    // 4) Slash Command 요청에는 곧바로 200 응답.
+    return immediateResponse;
   } catch (error) {
     console.error("POST 요청 실패:", error);
     return new Response("Internal Server Error", { status: 500 });
