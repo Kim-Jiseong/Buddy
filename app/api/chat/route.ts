@@ -16,22 +16,22 @@ export async function POST(req: Request) {
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
     const userText = formData.get("text") as string;
-    if (userText && userText.trim()) {
-      await web.chat.postMessage({
-        text: "/reserve " + userText,
-        channel: formData.get("channel_id") as string,
-      });
-    } else {
-      await web.chat.postMessage({
-        text: "/reserve ",
-        channel: formData.get("channel_id") as string,
-      });
-    }
+    // if (userText && userText.trim()) {
+    //   await web.chat.postMessage({
+    //     text: "/reserve " + userText,
+    //     channel: formData.get("channel_id") as string,
+    //   });
+    // } else {
+    //   await web.chat.postMessage({
+    //     text: "/reserve ",
+    //     channel: formData.get("channel_id") as string,
+    //   });
+    // }
 
-    // await web.chat.postMessage({
-    //   text: "잠시만 기다려주세요...",
-    //   channel: formData.get("channel_id") as string,
-    // });
+    await web.chat.postMessage({
+      text: "잠시만 기다려주세요...",
+      channel: formData.get("channel_id") as string,
+    });
 
     const { textStream } = streamText({
       model: anthropic("claude-3-5-sonnet-latest"),
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     })();
 
     // 즉시 응답 반환
-    return new Response("ok");
+    return new Response("/reserve" + userText);
   } else {
     const body = await req.json();
     messages = body.messages;
