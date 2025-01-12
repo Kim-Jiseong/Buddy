@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const formData = await req.formData();
 
     await web.chat.postMessage({
-      text: formData.get("text") as string,
+      text: (formData.get("text") as string) ?? "여기 없음",
       channel: formData.get("channel_id") as string,
     });
 
