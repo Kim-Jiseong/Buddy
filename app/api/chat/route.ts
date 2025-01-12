@@ -16,16 +16,15 @@ export async function POST(req: Request) {
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
 
-    await web.chat.postMessage({
-      text: formData.get("messages") as string,
-      channel: formData.get("channel_id") as string,
-    });
+    // await web.chat.postMessage({
+    //   text: formData.get("messages") as string,
+    //   channel: formData.get("channel_id") as string,
+    // });
 
-    // 먼저 "잠시만 기다려주세요" 메시지 전송
-    await web.chat.postMessage({
-      text: "잠시만 기다려주세요...",
-      channel: formData.get("channel_id") as string,
-    });
+    // await web.chat.postMessage({
+    //   text: "잠시만 기다려주세요...",
+    //   channel: formData.get("channel_id") as string,
+    // });
 
     const { textStream } = streamText({
       model: anthropic("claude-3-5-sonnet-latest"),
