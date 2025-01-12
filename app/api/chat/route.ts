@@ -4,30 +4,35 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { streamText } from "ai";
 import { z } from "zod";
 import { tools } from "./tools";
-
+import { WebClient } from "@slack/web-api";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const web = new WebClient(process.env.SLACK_BOT_TOKEN);
   let messages;
 
   const contentType = req.headers.get("content-type");
 
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
-    console.log("Form data:", formData);
-    return new Response(
-      JSON.stringify({
-        text: formData.get("messages") as string,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = {
+      text: formData.get("messages") as string,
+    };
+    // console.log("Form data:", formData);
+    console.log("Response:", response);
+    const result = await web.chat.postMessage({
+      text: formData.get("text") as string,
+      channel: formData.get("channel_id") as string,
+    });
+    return new Response(JSON.stringify(result), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   } else {
     const body = await req.json();
     messages = body.messages;
+    return "ok";
   }
 
   //   console.log("Request content-type:", contentType);
