@@ -61,7 +61,7 @@ export async function POST(req: Request) {
     // AI 응답 메시지 전송
     const result = await web.chat
       .postMessage({
-        text: fullText,
+        text: fullText ?? "\n\n잠시만 기다려주세요...",
         channel: formData.get("channel_id") as string,
       })
       .then(() => {
