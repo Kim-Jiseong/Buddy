@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
-    const { textStream } = streamText({
+    const { textStream } = await streamText({
       model: anthropic("claude-3-5-sonnet-latest"),
       messages: [
         {
@@ -39,6 +39,16 @@ export async function POST(req: Request) {
         //   ...messages,
       ],
     });
+    await web.chat.postMessage({
+      text: formData.get("messages") as string,
+      channel: formData.get("channel_id") as string,
+    });
+
+    // 먼저 "잠시만 기다려주세요" 메시지 전송
+    await web.chat.postMessage({
+      text: "잠시만 기다려주세요...",
+      channel: formData.get("channel_id") as string,
+    });
 
     let fullText = "";
 
@@ -47,13 +57,12 @@ export async function POST(req: Request) {
       fullText += textPart;
     }
 
-    // 모든 텍스트가 모아진 후 한 번에 전송
+    // AI 응답 메시지 전송
     const result = await web.chat.postMessage({
       text: fullText,
       channel: formData.get("channel_id") as string,
     });
-    console.log("여기", result);
-
+    return new Response("잠시만 기다려주세요...");
     // const generatedText = await streamText({
     //   model: anthropic("claude-3-5-sonnet-latest"),
     //   messages: [
@@ -93,7 +102,6 @@ export async function POST(req: Request) {
     //   text: formData.get("text") as string,
     //   channel: formData.get("channel_id") as string,
     // });
-    return new Response("잠시만 기다려주세요...");
   } else {
     const body = await req.json();
     messages = body.messages;
