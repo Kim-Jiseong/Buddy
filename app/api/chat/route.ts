@@ -40,14 +40,20 @@ export async function POST(req: Request) {
       ],
     });
 
+    let fullText = "";
+
     for await (const textPart of textStream) {
       process.stdout.write(textPart);
-      const result = await web.chat.postMessage({
-        text: textPart,
-        channel: formData.get("channel_id") as string,
-      });
-      console.log("여기", result, textPart);
+      fullText += textPart;
     }
+
+    // 모든 텍스트가 모아진 후 한 번에 전송
+    const result = await web.chat.postMessage({
+      text: fullText,
+      channel: formData.get("channel_id") as string,
+    });
+    console.log("여기", result);
+
     // const generatedText = await streamText({
     //   model: anthropic("claude-3-5-sonnet-latest"),
     //   messages: [
