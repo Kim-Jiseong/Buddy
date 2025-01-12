@@ -15,9 +15,16 @@ export async function POST(req: Request) {
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
     console.log("Form data:", formData);
-    // messages = JSON.parse(formData.get("messages") as string);
-
-    return new Response(formData.get("messages") as string);
+    return new Response(
+      JSON.stringify({
+        text: formData.get("messages") as string,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   } else {
     const body = await req.json();
     messages = body.messages;
