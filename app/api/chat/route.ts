@@ -58,11 +58,15 @@ export async function POST(req: Request) {
     }
 
     // AI 응답 메시지 전송
-    const result = await web.chat.postMessage({
-      text: fullText,
-      channel: formData.get("channel_id") as string,
-    });
-    return new Response("잠시만 기다려주세요...");
+    const result = await web.chat
+      .postMessage({
+        text: fullText,
+        channel: formData.get("channel_id") as string,
+      })
+      .then(() => {
+        fullText = "";
+      });
+    // return new Response("잠시만 기다려주세요...");
     // const generatedText = await streamText({
     //   model: anthropic("claude-3-5-sonnet-latest"),
     //   messages: [
