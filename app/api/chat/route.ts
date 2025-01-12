@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     //    이 시점에 Slash Command 요청/응답은 완료되므로, Slack이 타임아웃을 일으키지 않음.
     const quickResponse = {
       response_type: "ephemeral", // 혹은 "in_channel" 로 바꿀 수 있음
-      text: "처리를 시작했습니다...",
+      text: "/reserve " + userText,
     };
     // 여기서 200 OK를 즉시 return 해 줍니다.
     // (이후 로직은 백그라운드에서 수행)
