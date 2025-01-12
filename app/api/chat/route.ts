@@ -8,7 +8,22 @@ import { tools } from "./tools";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const { messages } = await req.json();
+  let messages;
+
+  const contentType = req.headers.get("content-type");
+
+  if (contentType?.includes("application/x-www-form-urlencoded")) {
+    const formData = await req.formData();
+    console.log("Form data:", formData);
+    // messages = JSON.parse(formData.get("messages") as string);
+  } else {
+    const body = await req.json();
+    messages = body.messages;
+  }
+
+  console.log("Request content-type:", contentType);
+  console.log("Processed messages:", messages);
+
   const result = streamText({
     model: anthropic("claude-3-5-sonnet-latest"),
     messages: [
