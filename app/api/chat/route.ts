@@ -43,12 +43,15 @@ export async function POST(req: Request) {
       async onFinish(response) {
         console.log(response);
         const result = await web.chat.postMessage({
-          text: formData.get("text") as string,
+          text: "완료됨",
           channel: formData.get("channel_id") as string,
         });
       },
     });
-
+    const result = await web.chat.postMessage({
+      text: formData.get("text") as string,
+      channel: formData.get("channel_id") as string,
+    });
     return new Response("잠시만 기다려주세요...");
   } else {
     const body = await req.json();
