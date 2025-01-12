@@ -64,7 +64,7 @@ export async function POST(req: Request) {
             ...processedMessages,
             { role: "user", content: decodedInput || "입력값 없음" },
           ],
-          //   tools,
+          tools,
         });
 
         let fullText = "";
