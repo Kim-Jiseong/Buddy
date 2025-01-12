@@ -15,15 +15,20 @@ export async function POST(req: Request) {
     const encodedQuery = url.searchParams.get("query") || "";
     const query = atob(encodedQuery);
     const web = new WebClient(process.env.SLACK_BOT_TOKEN);
-    const { text, channel_id } = await req.json();
-
+    const formData = await req.formData();
+    const text = (formData.get("text") as string) ?? "";
+    const channel_id = (formData.get("channel_id") as string) ?? "";
+    await web.chat.postMessage({
+      text: "잠시만 기다려주세요...",
+      channel: channel_id,
+    });
+    console.log(text, channel_id);
     // text가 비어있는 경우 처리
     const userInput = text?.trim();
     const decodedInput = userInput
       ? decodeURIComponent(userInput.replace(/\+/g, " "))
       : "";
 
-    console.log(channel_id, decodedInput);
     const messages = await fetchConversationHistory(channel_id);
     const updatedMessages = await replaceUserIdsWithInfo(messages);
     const processedMessages = updatedMessages
@@ -63,8 +68,6 @@ export async function POST(req: Request) {
 
         유저가 요청한 검색어:
         ${query}
-
-
               `,
             },
           ],

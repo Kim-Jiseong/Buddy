@@ -77,6 +77,7 @@ export async function POST(req: Request) {
           text: fullText.trim() || "내용이 없습니다.",
           channel: channel_id,
         });
+        console.log(fullText);
       } catch (error) {
         console.error("비동기 AI 처리 중 에러:", error);
         await web.chat.postMessage({
