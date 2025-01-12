@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       text: formData.get("text") as string,
       channel: formData.get("channel_id") as string,
     });
-    return new Response(JSON.stringify(result), {
+    return new Response("입력값:" + JSON.stringify(result), {
       headers: {
         "Content-Type": "application/json",
       },
