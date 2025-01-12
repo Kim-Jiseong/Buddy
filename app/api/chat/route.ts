@@ -35,6 +35,7 @@ export async function POST(req: Request) {
             anthropic: { cacheControl: { type: "ephemeral" } },
           },
         },
+        { role: "user", content: "도서관" },
         //   ...messages,
       ],
       maxSteps: 10,
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
       async onFinish(response) {
         console.log(response);
         const result = await web.chat.postMessage({
-          text: "완료됨" + response.text,
+          text: "완료됨" + response?.text,
           channel: formData.get("channel_id") as string,
         });
       },
