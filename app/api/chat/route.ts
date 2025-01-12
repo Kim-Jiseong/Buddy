@@ -15,11 +15,18 @@ export async function POST(req: Request) {
 
   if (contentType?.includes("application/x-www-form-urlencoded")) {
     const formData = await req.formData();
-
-    await web.chat.postMessage({
-      text: (formData.get("text") as string) ?? "여기 없음",
-      channel: formData.get("channel_id") as string,
-    });
+    const userText = formData.get("text") as string;
+    if (userText && userText.trim()) {
+      await web.chat.postMessage({
+        text: userText,
+        channel: formData.get("channel_id") as string,
+      });
+    } else {
+      await web.chat.postMessage({
+        text: "입력값없음",
+        channel: formData.get("channel_id") as string,
+      });
+    }
 
     // await web.chat.postMessage({
     //   text: "잠시만 기다려주세요...",
@@ -61,7 +68,8 @@ export async function POST(req: Request) {
     // AI 응답 메시지 전송
     const result = await web.chat
       .postMessage({
-        text: fullText ?? "\n\n잠시만 기다려주세요...",
+        text:
+          fullText && fullText.trim() ? fullText : "\n\n잠시만 기다려주세요...",
         channel: formData.get("channel_id") as string,
       })
       .then(() => {
